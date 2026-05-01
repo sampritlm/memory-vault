@@ -21,6 +21,7 @@ export default function Compose() {
   const [audioFile, setAudioFile] = useState(null)
   const [videoPreview, setVideoPreview] = useState(null)
   const [videoFile, setVideoFile] = useState(null)
+  const [videoStream, setVideoStream] = useState(null)
   
   const [loading, setLoading] = useState(false)
   const [dragActive, setDragActive] = useState(false)
@@ -41,6 +42,12 @@ export default function Compose() {
   const videoTimerRef = useRef(null)
   const liveVideoRef = useRef(null)
   const videoInputRef = useRef(null)
+
+  useEffect(() => {
+    if (liveVideoRef.current && videoStream) {
+      liveVideoRef.current.srcObject = videoStream
+    }
+  }, [isVideoRec, videoStream])
 
   const categories = ['Travel', 'Friends', 'Work', 'Personal']
 
@@ -149,7 +156,7 @@ export default function Compose() {
   const startVideoRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      if (liveVideoRef.current) liveVideoRef.current.srcObject = stream
+      setVideoStream(stream)
       
       const mediaRecorder = new MediaRecorder(stream)
       videoMediaRecorderRef.current = mediaRecorder
