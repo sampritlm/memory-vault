@@ -1,0 +1,405 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@utility line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@utility line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@utility line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ──────────────────────────────────────
+   LIGHT THEME (default)
+────────────────────────────────────── */
+:root {
+  --page-bg: #f5f0e8;
+  --page-bg-alt: #ede8df;
+  --card-bg: rgba(255, 255, 255, 0.75);
+  --nav-bg: rgba(253, 252, 248, 0.92);
+  --input-bg: rgba(255, 255, 255, 0.85);
+  --input-focus-bg: #ffffff;
+  --stat-bg: rgba(255, 255, 255, 0.75);
+  --empty-bg: rgba(255, 255, 255, 0.6);
+  --modal-overlay: rgba(42, 31, 14, 0.5);
+
+  --accent: #b8965a;
+  --accent-dim: #9a7a42;
+  --accent-pale: rgba(184, 150, 90, 0.1);
+  --accent-border: rgba(184, 150, 90, 0.28);
+  --accent-glow: rgba(184, 150, 90, 0.2);
+
+  --text-primary: #2a1f0e;
+  --text-secondary: rgba(80, 55, 20, 0.65);
+  --text-muted: rgba(80, 55, 20, 0.48);
+  --text-faint: rgba(80, 55, 20, 0.33);
+  --border-color: rgba(184, 150, 90, 0.22);
+
+  --grid-color: rgba(184, 150, 90, 0.04);
+}
+
+/* ──────────────────────────────────────
+   DARK THEME
+────────────────────────────────────── */
+.dark {
+  --page-bg: #1a1510;
+  --page-bg-alt: #231c14;
+  --card-bg: rgba(38, 28, 16, 0.78);
+  --nav-bg: rgba(15, 11, 6, 0.93);
+  --input-bg: rgba(28, 20, 10, 0.85);
+  --input-focus-bg: rgba(35, 26, 13, 0.95);
+  --stat-bg: rgba(30, 22, 12, 0.78);
+  --empty-bg: rgba(25, 18, 10, 0.6);
+  --modal-overlay: rgba(8, 5, 2, 0.72);
+
+  --accent: #aa884a;
+  --accent-dim: #8b6d36;
+  --accent-pale: rgba(170, 136, 74, 0.12);
+  --accent-border: rgba(170, 136, 74, 0.25);
+  --accent-glow: rgba(170, 136, 74, 0.18);
+
+  --text-primary: #d4c5ab;
+  --text-secondary: rgba(212, 197, 171, 0.68);
+  --text-muted: rgba(212, 197, 171, 0.46);
+  --text-faint: rgba(212, 197, 171, 0.32);
+  --border-color: rgba(170, 136, 74, 0.2);
+
+  --grid-color: rgba(170, 136, 74, 0.03);
+}
+
+/* ─── Base ─── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', 'Rajdhani', sans-serif;
+  background-color: var(--page-bg);
+  color: var(--text-primary);
+  transition: background-color 0.4s ease, color 0.4s ease;
+  min-height: 100vh;
+  background-image:
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ─── Keyframes ─── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes glowFloat {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Animation classes ─── */
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.35s ease-out;
+}
+
+.animate-float {
+  animation: glowFloat 4s ease-in-out infinite;
+}
+
+/* ─── Glassmorphic card ─── */
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--accent-border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: all 0.35s ease;
+}
+
+.glass-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 8px 40px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
+}
+
+/* ─── Text helpers ─── */
+.neon-text {
+  color: var(--accent);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ─── Primary button ─── */
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #d4b87a 0%, var(--accent) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 20px var(--accent-glow), 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary:hover::before {
+  opacity: 1;
+}
+
+.btn-primary:hover span,
+.btn-primary:hover svg {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Input fields ─── */
+.razer-input {
+  background: var(--input-bg) !important;
+  border: 1px solid var(--accent-border) !important;
+  color: var(--text-primary) !important;
+  transition: all 0.3s ease;
+}
+
+.razer-input::placeholder {
+  color: var(--text-faint) !important;
+}
+
+.razer-input:focus {
+  outline: none !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-pale), 0 2px 8px var(--accent-glow) !important;
+  background: var(--input-focus-bg) !important;
+}
+
+/* ─── Card hover ─── */
+.card-hover {
+  transition: all 0.35s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 0 20px var(--accent-glow);
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--page-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-dim);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* ─── Loader ─── */
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--accent-pale);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ─── Nav ─── */
+.razer-nav {
+  background: var(--nav-bg) !important;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-color) !important;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  transition: background 0.4s ease, border-color 0.4s ease;
+}
+
+/* ─── Stat card ─── */
+.stat-card {
+  background: var(--stat-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--accent-border);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05);
+  transition: all 0.35s ease;
+}
+
+.stat-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 24px var(--accent-glow);
+}
+
+/* ─── Icon bg ─── */
+.icon-bg {
+  background: var(--accent-pale);
+  border: 1px solid var(--accent-border);
+}
+
+/* ─── Theme transition ─── */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
+/* override for transforms so they don't get the slow transition */
+.glass-card,
+.card-hover,
+.btn-primary {
+  transition: all 0.35s ease;
+}
+
+/* ─── Quill Editor Theme Customization ─── */
+.quill-custom .ql-toolbar {
+  background: var(--nav-bg) !important;
+  border-color: var(--accent-border) !important;
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+  padding: 12px !important;
+}
+
+.quill-custom .ql-container {
+  background: var(--input-bg) !important;
+  border-color: var(--accent-border) !important;
+  border-bottom-left-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+  font-family: inherit !important;
+  font-size: 1rem !important;
+  color: var(--text-primary) !important;
+}
+
+.quill-custom .ql-editor {
+  min-height: 250px;
+}
+
+.quill-custom .ql-editor.ql-blank::before {
+  color: var(--text-faint) !important;
+  font-style: normal !important;
+}
+
+/* Toolbar Icon Colors */
+.quill-custom .ql-stroke {
+  stroke: var(--text-secondary) !important;
+}
+
+.quill-custom .ql-fill {
+  fill: var(--text-secondary) !important;
+}
+
+.quill-custom .ql-picker-label,
+.quill-custom .ql-picker-item {
+  color: var(--text-secondary) !important;
+}
+
+/* Dropdown background */
+.quill-custom .ql-picker-options {
+  background: var(--card-bg) !important;
+  border-color: var(--accent-border) !important;
+  backdrop-filter: blur(16px);
+}
+
+/* Hover/Active states */
+.quill-custom button:hover .ql-stroke,
+.quill-custom button:focus .ql-stroke,
+.quill-custom button.ql-active .ql-stroke,
+.quill-custom .ql-picker-label:hover .ql-stroke,
+.quill-custom .ql-picker-label.ql-active .ql-stroke {
+  stroke: var(--accent) !important;
+}
+
+.quill-custom button:hover .ql-fill,
+.quill-custom button:focus .ql-fill,
+.quill-custom button.ql-active .ql-fill,
+.quill-custom .ql-picker-label:hover .ql-fill,
+.quill-custom .ql-picker-label.ql-active .ql-fill {
+  fill: var(--accent) !important;
+}
+
+.quill-custom .ql-picker-item:hover,
+.quill-custom .ql-picker-item.ql-selected,
+.quill-custom .ql-picker-label:hover,
+.quill-custom .ql-picker-label.ql-active {
+  color: var(--accent) !important;
+}
