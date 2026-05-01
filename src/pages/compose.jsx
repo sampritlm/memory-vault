@@ -376,12 +376,16 @@ export default function Compose() {
               ) : isVideoRec ? (
                 <div className="relative border-2 border-solid rounded-xl overflow-hidden flex flex-col items-center justify-center" style={{ borderColor: 'var(--accent)', background: 'black', boxShadow: '0 0 20px rgba(255,50,50,0.2)' }}>
                   <video ref={liveVideoRef} autoPlay muted className="w-full h-auto max-h-64 object-cover opacity-60" />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-                    <div className="w-4 h-4 rounded-full bg-red-500 animate-pulse mb-4"></div>
-                    <p className="text-xl font-bold tracking-widest text-red-400 mb-6 drop-shadow-md">{formatDuration(videoRecDuration)}</p>
-                    <button type="button" onClick={stopVideoRecording} className="px-6 py-2 rounded-full font-bold tracking-wider text-white shadow-lg" style={{ background: 'rgba(200,50,50,0.9)' }}>
-                      STOP RECORDING
-                    </button>
+                  <div className="absolute inset-0 z-10 pointer-events-none">
+                    <div className="absolute top-4 right-4 flex items-center gap-2 bg-black/50 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></div>
+                      <p className="text-sm font-bold tracking-widest text-red-400 drop-shadow-md">{formatDuration(videoRecDuration)}</p>
+                    </div>
+                    <div className="absolute bottom-6 inset-x-0 flex justify-center pointer-events-auto">
+                      <button type="button" onClick={stopVideoRecording} className="px-6 py-2 rounded-full text-sm font-bold tracking-wider text-white shadow-lg transition-transform hover:scale-105" style={{ background: 'rgba(200,50,50,0.9)' }}>
+                        STOP RECORDING
+                      </button>
+                    </div>
                   </div>
                 </div>
               ) : (
