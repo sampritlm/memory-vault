@@ -388,7 +388,42 @@ export default function Dashboard() {
   )
 }
 function MemoryCard({ memory, viewMode = 'grid', onView, onFavorite, onPin, onDelete }) {
-  const isTimeLocked = memory.unlockDate && new Date(memory.unlockDate) > new Date()
+  const [timeLeft, setTimeLeft] = useState('')
+  const [isTimeLocked, setIsTimeLocked] = useState(memory.unlockDate && new Date(memory.unlockDate) > new Date())
+
+  useEffect(() => {
+    if (!memory.unlockDate) return;
+
+    const calculateTimeLeft = () => {
+      const now = new Date()
+      const unlockTime = new Date(memory.unlockDate)
+      const difference = unlockTime - now
+
+      if (difference > 0) {
+        setIsTimeLocked(true)
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24)
+        const minutes = Math.floor((difference / 1000 / 60) % 60)
+        const seconds = Math.floor((difference / 1000) % 60)
+        
+        let timeString = '';
+        if (days > 0) timeString += `${days}d `
+        if (hours > 0 || days > 0) timeString += `${hours}h `
+        if (minutes > 0 || hours > 0 || days > 0) timeString += `${minutes}m `
+        timeString += `${seconds}s`
+        
+        setTimeLeft(timeString)
+      } else {
+        setIsTimeLocked(false)
+        setTimeLeft('')
+      }
+    }
+
+    calculateTimeLeft()
+    const timer = setInterval(calculateTimeLeft, 1000)
+    return () => clearInterval(timer)
+  }, [memory.unlockDate])
+
   if (viewMode === 'list') {
     return (
       <div className="glass-card p-4 rounded-xl flex justify-between items-center transition-all">
@@ -402,7 +437,7 @@ function MemoryCard({ memory, viewMode = 'grid', onView, onFavorite, onPin, onDe
           </div>
           <p className="text-xs tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>{format(new Date(memory.date), 'MMM dd, yyyy')} &nbsp;•&nbsp; {memory.category}</p>
           <p className="line-clamp-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
-            {isTimeLocked ? `🔒 Locked until ${format(new Date(memory.unlockDate), 'MMM dd, yyyy')}` : memory.isPrivate ? '🔒 Private memory' : stripHtml(memory.content)}
+            {isTimeLocked ? `🔒 Locked - Opens in: ${timeLeft}` : memory.isPrivate ? '🔒 Private memory' : stripHtml(memory.content)}
           </p>
         </div>
         <div className="flex space-x-1 ml-4">
@@ -425,6 +460,7 @@ function MemoryCard({ memory, viewMode = 'grid', onView, onFavorite, onPin, onDe
               <div className="bg-black bg-opacity-70 px-4 py-2 rounded-xl text-center border border-white border-opacity-20 backdrop-blur-sm">
                  <Lock className="w-6 h-6 mx-auto mb-1 text-white" />
                  <p className="text-xs font-bold tracking-widest text-white">LOCKED</p>
+                 <p className="text-[10px] tracking-wider text-gray-300 mt-1">{timeLeft}</p>
               </div>
             </div>
           )}
@@ -443,7 +479,7 @@ function MemoryCard({ memory, viewMode = 'grid', onView, onFavorite, onPin, onDe
         </div>
         <p className="text-xs tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>{format(new Date(memory.date), 'MMM dd, yyyy')} &nbsp;•&nbsp; {memory.category}</p>
         <p className="line-clamp-2 text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-          {isTimeLocked ? `🔒 Time-Locked until ${format(new Date(memory.unlockDate), 'MMM dd, yyyy')}` : memory.isPrivate ? '🔒 Private memory — Click to unlock' : stripHtml(memory.content)}
+          {isTimeLocked ? `🔒 Time-Locked - Opens in: ${timeLeft}` : memory.isPrivate ? '🔒 Private memory — Click to unlock' : stripHtml(memory.content)}
         </p>
         <div className="flex justify-between items-center">
           <button onClick={() => onView(memory)} className="text-xs font-bold tracking-wider transition-all" style={{ color: 'var(--accent)' }} onMouseEnter={e => e.currentTarget.style.color = 'var(--accent-dim)'} onMouseLeave={e => e.currentTarget.style.color = 'var(--accent)'}>
