@@ -12,7 +12,9 @@ import { memoriesAPI } from '../services/api'
 const getMediaUrl = (url) => {
   if (!url) return null;
   if (url.startsWith('data:') || url.startsWith('http')) return url;
-  if (url.startsWith('/uploads')) return `http://localhost:5000${url}`;
+  if (url.startsWith('/uploads')) {
+    return import.meta.env.MODE === 'development' ? `http://localhost:5000${url}` : url;
+  }
   return url;
 };
 

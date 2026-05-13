@@ -19,9 +19,9 @@ router.post('/', verifyToken, upload.fields([{ name: 'image', maxCount: 1 }, { n
     else if (result.score <= -2) moodEmoji = '😢';
     else if (result.score < 0) moodEmoji = '😟';
 
-    const imagePath = req.files && req.files['image'] ? `/uploads/${req.files['image'][0].filename}` : null;
-    const audioPath = req.files && req.files['audio'] ? `/uploads/${req.files['audio'][0].filename}` : null;
-    const videoPath = req.files && req.files['video'] ? `/uploads/${req.files['video'][0].filename}` : null;
+    const imagePath = req.files && req.files['image'] ? req.files['image'][0].location : null;
+    const audioPath = req.files && req.files['audio'] ? req.files['audio'][0].location : null;
+    const videoPath = req.files && req.files['video'] ? req.files['video'][0].location : null;
 
     const memory = new Memory({
       userId: req.user.userId,
