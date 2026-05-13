@@ -2,12 +2,12 @@ import dns from 'dns';
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { connectDB, getGFS } from './db.js';
 import authRoutes from './routes/auth.js';
 import memoryRoutes from './routes/memories.js';
 
@@ -21,22 +21,13 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '250mb' }));
 app.use(express.urlencoded({ limit: '250mb', extended: true }));
-let gfs;
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log('MongoDB Connected');
-    const db = mongoose.connection.db;
-    gfs = new mongoose.mongo.GridFSBucket(db, {
-      bucketName: 'uploads'
-    });
-  })
-  .catch(err => console.log(err));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/memories', memoryRoutes);
 
 // GridFS media streaming route
 app.get('/api/media/:filename', async (req, res) => {
+  const gfs = getGFS();
   if (!gfs) return res.status(500).json({ message: 'GridFS not initialized' });
   try {
     const files = await gfs.find({ filename: req.params.filename }).toArray();
@@ -63,3 +54,5 @@ if (process.env.NODE_ENV === 'production') {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+connectDB(process.env.MONGO_URI).catch(err => console.error('DB connection error:', err));
