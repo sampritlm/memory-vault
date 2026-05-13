@@ -24,6 +24,7 @@ export default function Compose() {
   const [videoStream, setVideoStream] = useState(null)
   
   const [loading, setLoading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [dragActive, setDragActive] = useState(false)
   const [audioDragActive, setAudioDragActive] = useState(false)
   const [videoDragActive, setVideoDragActive] = useState(false)
@@ -122,7 +123,10 @@ export default function Compose() {
       }, 1000)
 
     } catch (err) {
-      toast.error('Could not access microphone')
+      if (err.name === 'NotAllowedError') toast.error('Microphone access denied. Allow it in browser settings.')
+      else if (err.name === 'NotFoundError') toast.error('No microphone found on this device.')
+      else if (err.name === 'NotReadableError') toast.error('Microphone is in use by another app.')
+      else toast.error('Could not access microphone: ' + err.message)
       console.error(err)
     }
   }
@@ -186,7 +190,10 @@ export default function Compose() {
       }, 1000)
 
     } catch (err) {
-      toast.error('Could not access camera/microphone')
+      if (err.name === 'NotAllowedError') toast.error('Camera/mic access denied. Click the camera icon in your browser\'s address bar to allow.')
+      else if (err.name === 'NotFoundError') toast.error('No camera or microphone found on this device.')
+      else if (err.name === 'NotReadableError') toast.error('Camera or mic is already in use by another app.')
+      else toast.error('Could not access camera/microphone: ' + err.message)
       console.error(err)
     }
   }
@@ -221,6 +228,7 @@ export default function Compose() {
     if (!formData.content.trim()) { toast.error('Content is required'); return }
     if (formData.isPrivate && !formData.password) { toast.error('Password required for private memories'); return }
     setLoading(true)
+    setUploadProgress(0)
     try {
       const payload = new FormData()
       payload.append('title', formData.title)
@@ -235,13 +243,14 @@ export default function Compose() {
       if (audioFile) payload.append('audio', audioFile)
       if (videoFile) payload.append('video', videoFile)
 
-      await memoriesAPI.create(payload)
+      await memoriesAPI.create(payload, setUploadProgress)
       toast.success('Memory saved!')
       navigate('/dashboard')
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to save memory')
     } finally {
       setLoading(false)
+      setUploadProgress(0)
     }
   }
 
@@ -425,9 +434,20 @@ export default function Compose() {
               )}
             </div>
 
+            {loading && videoFile && uploadProgress > 0 && (
+              <div className="w-full rounded-xl overflow-hidden" style={{ background: 'var(--nav-bg)', border: '1px solid var(--accent-border)' }}>
+                <div className="flex justify-between items-center px-4 py-2">
+                  <span className="text-xs font-bold tracking-wider" style={{ color: 'var(--text-secondary)' }}>UPLOADING VIDEO...</span>
+                  <span className="text-xs font-bold" style={{ color: 'var(--accent)' }}>{uploadProgress}%</span>
+                </div>
+                <div className="h-2 w-full" style={{ background: 'var(--border-color)' }}>
+                  <div className="h-2 transition-all duration-300" style={{ width: `${uploadProgress}%`, background: 'var(--accent)', boxShadow: '0 0 8px var(--accent-glow)' }} />
+                </div>
+              </div>
+            )}
             <button type="submit" disabled={loading} className="btn-primary w-full py-4 rounded-xl flex items-center justify-center gap-2 font-bold tracking-[0.15em] disabled:opacity-40 relative overflow-hidden" style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: '0.95rem' }}>
               <Save className="w-5 h-5 relative z-10" />
-              <span className="relative z-10">{loading ? 'SAVING...' : 'SAVE MEMORY'}</span>
+              <span className="relative z-10">{loading ? (videoFile && uploadProgress > 0 ? `UPLOADING ${uploadProgress}%` : 'SAVING...') : 'SAVE MEMORY'}</span>
             </button>
           </form>
         </div>

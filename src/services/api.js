@@ -17,7 +17,12 @@ export const authAPI = {
 };
 
 export const memoriesAPI = {
-  create: (data) => API.post('/memories', data),
+  create: (data, onUploadProgress) => API.post('/memories', data, {
+    onUploadProgress: onUploadProgress ? (e) => {
+      const pct = Math.round((e.loaded * 100) / e.total);
+      onUploadProgress(pct);
+    } : undefined
+  }),
   getAll: () => API.get('/memories'),
   getOne: (id) => API.get(`/memories/${id}`),
   update: (id, data) => API.put(`/memories/${id}`, data),
