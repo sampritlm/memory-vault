@@ -12,8 +12,14 @@ import { memoriesAPI } from '../services/api'
 const getMediaUrl = (url) => {
   if (!url) return null;
   if (url.startsWith('data:') || url.startsWith('http')) return url;
-  if (url.startsWith('/uploads')) {
+  if (url.startsWith('/api/media')) {
     return import.meta.env.MODE === 'development' ? `http://localhost:5000${url}` : url;
+  }
+  // Graceful fallback for old memories that still have /uploads/
+  if (url.startsWith('/uploads')) {
+    const filename = url.replace('/uploads/', '');
+    const newUrl = `/api/media/${filename}`;
+    return import.meta.env.MODE === 'development' ? `http://localhost:5000${newUrl}` : newUrl;
   }
   return url;
 };

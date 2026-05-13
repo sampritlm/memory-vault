@@ -18,15 +18,36 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '250mb' }));
 app.use(express.urlencoded({ limit: '250mb', extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
-
-// Connect to MongoDB
+let gfs;
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB Connected'))
+  .then(() => {
+    console.log('MongoDB Connected');
+    const db = mongoose.connection.db;
+    gfs = new mongoose.mongo.GridFSBucket(db, {
+      bucketName: 'uploads'
+    });
+  })
   .catch(err => console.log(err));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/memories', memoryRoutes);
+
+// GridFS media streaming route
+app.get('/api/media/:filename', async (req, res) => {
+  if (!gfs) return res.status(500).json({ message: 'GridFS not initialized' });
+  try {
+    const files = await gfs.find({ filename: req.params.filename }).toArray();
+    if (!files || files.length === 0) {
+      return res.status(404).json({ message: 'File not found' });
+    }
+    const contentType = files[0].contentType || 'application/octet-stream';
+    res.set('Content-Type', contentType);
+    const readStream = gfs.openDownloadStreamByName(req.params.filename);
+    readStream.pipe(res);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error fetching file' });
+  }
+});
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
